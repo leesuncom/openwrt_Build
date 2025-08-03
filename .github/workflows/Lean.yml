@@ -146,11 +146,17 @@ jobs:
         fi
         df -hT
 
+    #- name: Compile the firmware
+    #  working-directory: ./openwrt
+    #  run: |
+    #    echo -e "$(($(nproc)+1)) thread compile"
+    #    make -j$(($(nproc)+1)) || make -j1 V=s
+
     - name: Compile the firmware
       working-directory: ./openwrt
       run: |
-        echo -e "$(($(nproc)+1)) thread compile"
-        make -j$(($(nproc)+1)) || make -j1 V=s
+        echo -e "1 thread compile with verbose log"
+        make -j1 V=s  # 替换原来的 make -j$(($(nproc)+1)) || make -j1 V=s
 
     - name: Upload bin directory
       uses: actions/upload-artifact@main
