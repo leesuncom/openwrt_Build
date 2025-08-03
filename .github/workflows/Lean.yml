@@ -114,12 +114,17 @@ jobs:
         rm -rf feeds/luci/applications/luci-app-openclash
         cp -f feeds/smpackage/.github/diy/default-settings package/lean/default-settings/files/zzz-default-settings
         cp -f feeds/smpackage/.github/diy/banner package/base-files/files/etc/banner
-        #cp -f feeds/smpackage/.github/diy/index_x86.htm package/lean/autocore/files/x86/index.htm
         sed -i "s/%D %V, %C/openwrt $(date +'%m.%d') by kenzo/g" package/base-files/files/etc/banner
         sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
         ./scripts/feeds update -a 
         sed -i 's#GO_PKG_TARGET_VARS.*# #g' feeds/packages/utils/v2dat/Makefile 
         ./scripts/feeds install -a
+        # 排除依赖缺失的包
+        sed -i '/CONFIG_PACKAGE_geodata/d' .config
+        sed -i '/CONFIG_PACKAGE_luci-app-dogcom/d' .config
+        sed -i '/CONFIG_PACKAGE_luci-app-ssr-plus/d' .config
+        sed -i '/CONFIG_PACKAGE_natflow/d' .config
+        make defconfig
         cp -f feeds/smpackage/.github/diy/${{matrix.target}}.config .config && make defconfig
         #sed -i 's/CONFIG_BINUTILS_VERSION="2.42"/CONFIG_BINUTILS_VERSION="2.43.1"/' .config
         
