@@ -124,7 +124,6 @@ jobs:
         sed -i '/CONFIG_PACKAGE_luci-app-dogcom/d' .config
         sed -i '/CONFIG_PACKAGE_luci-app-ssr-plus/d' .config
         sed -i '/CONFIG_PACKAGE_natflow/d' .config
-        make defconfig
         cp -f feeds/smpackage/.github/diy/${{matrix.target}}.config .config && make defconfig
         #sed -i 's/CONFIG_BINUTILS_VERSION="2.42"/CONFIG_BINUTILS_VERSION="2.43.1"/' .config
         
