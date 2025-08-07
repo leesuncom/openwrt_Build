@@ -185,11 +185,9 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo -e "墙内外加速下载 🎈:\n" >> release.txt
-        echo -e "[kenzo] (https://${{ secrets.REMOTE_HOST }}/op/firmware/${{matrix.target}})\n" >> release.txt
+        echo "release_tag=${{ env.FIRMWARE_TAG }}-${{ env.REPO_BRANCH }}-$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
-        [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
-        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+        [ ${UPLOAD_GOFILE} = true && ${{ steps.gofile.outputs.url }} ] && echo "🔗 [GoFile](${{ steps.gofile.outputs.url }})" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
@@ -198,22 +196,23 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_N9 }}
       with:
-        files: "${{ env.FIRMWARE }}/*"
-        name: ${{ env.date2 }} ${{matrix.target}}
-        tag_name: ${{ env.date }}_${{matrix.target}}
+        files: ${{ env.FIRMWARE }}/*  # 包含所有.chk、.bin、配置文件等
+        name: ${{ env.date2 }} R7000-${{matrix.target}}
+        tag_name: ${{ env.date }}_R7000-${{matrix.target}}
         body_path: release.txt
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main
       with:
-        retain_days: 1
-        keep_minimum_runs: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+        retain_days: 0
+        keep_minimum_runs: 2
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@master
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        keep_latest: 6
+        keep_latest: 4
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
